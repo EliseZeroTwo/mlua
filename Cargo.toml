@@ -29,7 +29,7 @@ members = [
 
 [features]
 default = ["picolua"]
-picolua = ["pico-lua-src"]
+picolua = ["picolua-src"]
 lua54 = []
 lua53 = []
 lua52 = []
@@ -55,7 +55,7 @@ erased-serde = { version = "0.3", optional = true }
 [build-dependencies]
 cc = { version = "1.0" }
 pkg-config = { version = "0.3.17" }
-pico-lua-src = { path = "../lua-src-rs", version = "542.0.0", optional = true }
+pico-lua-src = { path = "../picolua-src", version = "542.0.0", optional = true }
 lua-src = { version = ">= 540.0.0, < 550.0.0", optional = true }
 luajit-src = { version = ">= 210.1.0, < 220.0.0", optional = true }
 
