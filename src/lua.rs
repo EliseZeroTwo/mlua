@@ -88,7 +88,7 @@ struct MemoryInfo {
 pub enum GCMode {
     Incremental,
     /// Requires `feature = "lua54"`
-    #[cfg(any(feature = "lua54", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", doc))]
     Generational,
 }
 
@@ -247,13 +247,13 @@ impl Lua {
             new_ptr
         }
 
-        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
         let mem_info = Box::into_raw(Box::new(MemoryInfo {
             used_memory: 0,
             memory_limit: 0,
         }));
 
-        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
         let state = ffi::lua_newstate(allocator, mem_info as *mut c_void);
         #[cfg(any(feature = "lua51", feature = "luajit"))]
         let state = ffi::luaL_newstate();
@@ -263,7 +263,7 @@ impl Lua {
 
         let mut lua = Lua::init_from_ptr(state);
         lua.ephemeral = false;
-        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
         {
             mlua_expect!(lua.extra.lock(), "extra is poisoned").mem_info = mem_info;
         }
@@ -526,7 +526,7 @@ impl Lua {
     /// Does not work on module mode where Lua state is managed externally.
     ///
     /// Requires `feature = "lua54/lua53/lua52"`
-    #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52", doc))]
     pub fn set_memory_limit(&self, memory_limit: usize) -> Result<usize> {
         let mut extra = mlua_expect!(self.extra.lock(), "extra is poisoned");
         if extra.mem_info.is_null() {
@@ -542,7 +542,7 @@ impl Lua {
     /// Returns true if the garbage collector is currently running automatically.
     ///
     /// Requires `feature = "lua54/lua53/lua52"`
-    #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52", doc))]
     pub fn gc_is_running(&self) -> bool {
         let state = self.main_state.unwrap_or(self.state);
         unsafe { ffi::lua_gc(state, ffi::LUA_GCISRUNNING, 0) != 0 }
@@ -641,7 +641,7 @@ impl Lua {
             GCMode::Incremental
         }
 
-        #[cfg(feature = "lua54")]
+        #[cfg(any(feature = "picolua", feature = "lua54"))]
         let prev_mode = unsafe {
             ffi::lua_gc(
                 state,
@@ -651,7 +651,7 @@ impl Lua {
                 step_size,
             )
         };
-        #[cfg(feature = "lua54")]
+        #[cfg(any(feature = "picolua", feature = "lua54"))]
         match prev_mode {
             ffi::LUA_GCINC => GCMode::Incremental,
             ffi::LUA_GCGEN => GCMode::Generational,
@@ -667,7 +667,7 @@ impl Lua {
     /// Requires `feature = "lua54"`
     ///
     /// [lua_doc]: https://www.lua.org/manual/5.4/manual.html#2.5.2
-    #[cfg(any(feature = "lua54", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", doc))]
     pub fn gc_gen(&self, minor_multiplier: c_int, major_multiplier: c_int) -> GCMode {
         let state = self.main_state.unwrap_or(self.state);
         let prev_mode =
@@ -739,7 +739,7 @@ impl Lua {
                 ffi::LUA_OK => {
                     if let Some(env) = env {
                         self.push_value(env)?;
-                        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+                        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
                         ffi::lua_setupvalue(self.state, -2, 1);
                         #[cfg(any(feature = "lua51", feature = "luajit"))]
                         ffi::lua_setfenv(self.state, -2);
@@ -1021,7 +1021,7 @@ impl Lua {
         unsafe {
             let _sg = StackGuard::new(self.state);
             assert_stack(self.state, 2);
-            #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
             ffi::lua_rawgeti(self.state, ffi::LUA_REGISTRYINDEX, ffi::LUA_RIDX_GLOBALS);
             #[cfg(any(feature = "lua51", feature = "luajit"))]
             ffi::lua_pushvalue(self.state, ffi::LUA_GLOBALSINDEX);
@@ -1671,7 +1671,7 @@ impl Lua {
     where
         'lua: 'callback,
     {
-        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
         {
             let libs = mlua_expect!(self.extra.lock(), "extra is poisoned").libs;
             if !libs.contains(StdLib::COROUTINE) {
@@ -1847,7 +1847,7 @@ impl Lua {
             })?,
         )?;
 
-        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
         let searchers: Table = package.get("searchers")?;
         #[cfg(any(feature = "lua51", feature = "luajit"))]
         let searchers: Table = package.get("loaders")?;
@@ -2076,7 +2076,7 @@ unsafe fn load_from_std_lib(state: *mut ffi::lua_State, libs: StdLib) {
     // Stop collector during library initialization
     ffi::lua_gc(state, ffi::LUA_GCSTOP, 0);
 
-    #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
     {
         if libs.contains(StdLib::COROUTINE) {
             let colib_name = CString::new(ffi::LUA_COLIBNAME).unwrap();
@@ -2091,25 +2091,13 @@ unsafe fn load_from_std_lib(state: *mut ffi::lua_State, libs: StdLib) {
         ffi::lua_pop(state, 1);
     }
 
-    if libs.contains(StdLib::IO) {
-        let iolib_name = CString::new(ffi::LUA_IOLIBNAME).unwrap();
-        ffi::luaL_requiref(state, iolib_name.as_ptr(), ffi::luaopen_io, 1);
-        ffi::lua_pop(state, 1);
-    }
-
-    if libs.contains(StdLib::OS) {
-        let oslib_name = CString::new(ffi::LUA_OSLIBNAME).unwrap();
-        ffi::luaL_requiref(state, oslib_name.as_ptr(), ffi::luaopen_os, 1);
-        ffi::lua_pop(state, 1);
-    }
-
     if libs.contains(StdLib::STRING) {
         let strlib_name = CString::new(ffi::LUA_STRLIBNAME).unwrap();
         ffi::luaL_requiref(state, strlib_name.as_ptr(), ffi::luaopen_string, 1);
         ffi::lua_pop(state, 1);
     }
 
-    #[cfg(any(feature = "lua54", feature = "lua53"))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
     {
         if libs.contains(StdLib::UTF8) {
             let utf8lib_name = CString::new(ffi::LUA_UTF8LIBNAME).unwrap();

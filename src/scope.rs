@@ -314,7 +314,7 @@ impl<'lua, 'scope> Scope<'lua, 'scope> {
             assert_stack(lua.state, 6);
 
             push_userdata(lua.state, ())?;
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             ffi::lua_pushlightuserdata(lua.state, data.as_ptr() as *mut c_void);
             #[cfg(any(feature = "lua52", feature = "lua51", feature = "luajit"))]
             protect_lua_closure(lua.state, 0, 1, |state| {
@@ -415,7 +415,7 @@ impl<'lua, 'scope> Scope<'lua, 'scope> {
             // We know the destructor has not run yet because we hold a reference to the callback.
 
             // First, get the environment table
-            #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
             ffi::lua_getupvalue(state, -1, 1);
             #[cfg(any(feature = "lua51", feature = "luajit"))]
             ffi::lua_getfenv(state, -1);

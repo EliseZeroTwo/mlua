@@ -486,7 +486,7 @@ pub unsafe extern "C" fn error_traceback(state: *mut ffi::lua_State) -> c_int {
 
 // Does not call lua_checkstack, uses 1 stack space.
 pub unsafe fn get_main_state(state: *mut ffi::lua_State) -> Option<*mut ffi::lua_State> {
-    #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
     {
         ffi::lua_rawgeti(state, ffi::LUA_REGISTRYINDEX, ffi::LUA_RIDX_MAINTHREAD);
         let main_state = ffi::lua_tothread(state, -1);
@@ -671,19 +671,19 @@ pub unsafe fn init_error_registry(state: *mut ffi::lua_State) {
         cstr!("__mod"),
         cstr!("__pow"),
         cstr!("__unm"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__idiv"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__band"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__bor"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__bxor"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__bnot"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__shl"),
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         cstr!("__shr"),
         cstr!("__concat"),
         cstr!("__len"),
@@ -694,11 +694,11 @@ pub unsafe fn init_error_registry(state: *mut ffi::lua_State) {
         cstr!("__newindex"),
         cstr!("__call"),
         cstr!("__tostring"),
-        #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
         cstr!("__pairs"),
         #[cfg(any(feature = "lua53", feature = "lua52"))]
         cstr!("__ipairs"),
-        #[cfg(feature = "lua54")]
+        #[cfg(any(feature = "picolua", feature = "lua54"))]
         cstr!("__close"),
     ] {
         ffi::lua_pushstring(state, method);

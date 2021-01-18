@@ -42,29 +42,29 @@ pub enum MetaMethod {
     Unm,
     /// The floor division (//) operator.
     /// Requires `feature = "lua54/lua53"`
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     IDiv,
     /// The bitwise AND (&) operator.
     /// Requires `feature = "lua54/lua53"`
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     BAnd,
     /// The bitwise OR (|) operator.
     /// Requires `feature = "lua54/lua53"`
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     BOr,
     /// The bitwise XOR (binary ~) operator.
     /// Requires `feature = "lua54/lua53"`
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     BXor,
     /// The bitwise NOT (unary ~) operator.
     /// Requires `feature = "lua54/lua53"`
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     BNot,
     /// The bitwise left shift (<<) operator.
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     Shl,
     /// The bitwise right shift (>>) operator.
-    #[cfg(any(feature = "lua54", feature = "lua53", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", doc))]
     Shr,
     /// The string concatenation operator `..`.
     Concat,
@@ -91,7 +91,7 @@ pub enum MetaMethod {
     /// This is not an operator, but it will be called by the built-in `pairs` function.
     ///
     /// Requires `feature = "lua54/lua53/lua52"`
-    #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52", doc))]
     Pairs,
     /// The `__close` metamethod.
     ///
@@ -103,7 +103,7 @@ pub enum MetaMethod {
     /// Requires `feature = "lua54"`
     ///
     /// [lua_doc]: https://www.lua.org/manual/5.4/manual.html#3.3.8
-    #[cfg(any(feature = "lua54", doc))]
+    #[cfg(any(feature = "picolua", feature = "lua54", doc))]
     Close,
 }
 
@@ -118,19 +118,19 @@ impl MetaMethod {
             MetaMethod::Pow => b"__pow",
             MetaMethod::Unm => b"__unm",
 
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::IDiv => b"__idiv",
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::BAnd => b"__band",
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::BOr => b"__bor",
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::BXor => b"__bxor",
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::BNot => b"__bnot",
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::Shl => b"__shl",
-            #[cfg(any(feature = "lua54", feature = "lua53"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
             MetaMethod::Shr => b"__shr",
 
             MetaMethod::Concat => b"__concat",
@@ -143,10 +143,10 @@ impl MetaMethod {
             MetaMethod::Call => b"__call",
             MetaMethod::ToString => b"__tostring",
 
-            #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+            #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
             MetaMethod::Pairs => b"__pairs",
 
-            #[cfg(feature = "lua54")]
+            #[cfg(any(feature = "picolua", feature = "lua54"))]
             MetaMethod::Close => b"__close",
         }
     }
@@ -505,7 +505,7 @@ impl<'lua> AnyUserData<'lua> {
             t.raw_set(1, v)?;
             crate::Value::Table(t)
         };
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         let v = v.to_lua(lua)?;
         unsafe {
             let _sg = StackGuard::new(lua.state);
@@ -533,7 +533,7 @@ impl<'lua> AnyUserData<'lua> {
         };
         #[cfg(any(feature = "lua52", feature = "lua51", feature = "luajit"))]
         return crate::Table::from_lua(res, lua)?.get(1);
-        #[cfg(any(feature = "lua54", feature = "lua53"))]
+        #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
         V::from_lua(res, lua)
     }
 

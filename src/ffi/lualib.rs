@@ -28,11 +28,11 @@ use std::os::raw::c_int;
 use super::lua::lua_State;
 
 pub use super::glue::{
-    LUA_COLIBNAME, LUA_DBLIBNAME, LUA_IOLIBNAME, LUA_LOADLIBNAME, LUA_MATHLIBNAME, LUA_OSLIBNAME,
+    LUA_COLIBNAME, LUA_DBLIBNAME, LUA_LOADLIBNAME, LUA_MATHLIBNAME,
     LUA_STRLIBNAME, LUA_TABLIBNAME,
 };
 
-#[cfg(any(feature = "lua54", feature = "lua53"))]
+#[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
 pub use super::glue::LUA_UTF8LIBNAME;
 
 #[cfg(any(feature = "lua52", feature = "luajit"))]
@@ -43,13 +43,13 @@ pub use super::glue::{LUA_FFILIBNAME, LUA_JITLIBNAME};
 
 extern "C" {
     pub fn luaopen_base(L: *mut lua_State) -> c_int;
-    #[cfg(any(feature = "lua54", feature = "lua53", feature = "lua52"))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53", feature = "lua52"))]
     pub fn luaopen_coroutine(L: *mut lua_State) -> c_int;
     pub fn luaopen_table(L: *mut lua_State) -> c_int;
     pub fn luaopen_io(L: *mut lua_State) -> c_int;
     pub fn luaopen_os(L: *mut lua_State) -> c_int;
     pub fn luaopen_string(L: *mut lua_State) -> c_int;
-    #[cfg(any(feature = "lua54", feature = "lua53"))]
+    #[cfg(any(feature = "picolua", feature = "lua54", feature = "lua53"))]
     pub fn luaopen_utf8(L: *mut lua_State) -> c_int;
     #[cfg(feature = "lua52")]
     pub fn luaopen_bit32(L: *mut lua_State) -> c_int;
