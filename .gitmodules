@@ -1,0 +1,3 @@
+[submodule "picolua-src"]
+	path = picolua-src
+	url = git@github.com:EliseZeroTwo/picolua-src.git
